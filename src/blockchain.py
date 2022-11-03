@@ -1,4 +1,4 @@
-import os
+import socket
 # Python program to create Blockchain
  
 # For timestamp
@@ -13,11 +13,6 @@ import hashlib
 # in our blockchain
 import json as JSON
  
-# Flask is for creating the web
-# app and jsonify is for
-# displaying the blockchain
-from flask import Flask, jsonify
- 
  
 class Blockchain:
    
@@ -28,13 +23,17 @@ class Blockchain:
         self.chain = []
         self.create_block(proof=1, previous_hash='0')
         self.lake_list = [
-            '0.0.0.0',
+            ('0.0.0.0', 8080),
         ]
+        self.ip='1.2.3.4'
  
     # This function is created
     # to add further blocks
     # into the chain
     def create_block(self, proof, previous_hash):
+        #validate block
+        #add to current blockchain
+        #broadcast_to_network()
         block = {'index': len(self.chain) + 1,
                  'timestamp': str(datetime.datetime.now()),
                  'proof': proof,
@@ -90,61 +89,20 @@ class Blockchain:
          
         return True
     
-    def broadcast_to_network():
-        pass
+    def broadcast_to_network(self):
+        HOST = '172.20.44.19'
+        PORT = 8080  # The port used by the server
+
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
+            
+            message = str(self.chain)
+            s.sendall(bytes(message, 'utf-8'))
+            data = s.recv(1024)
+            print("recieved", data)
+
+        return
     
     def collect_from_network():
-        pass
 
- 
- 
-# Creating the Web
-# App using flask
-app = Flask(__name__)
- 
-# Create the object
-# of the class blockchain
-blockchain = Blockchain()
- 
-# Mining a new block
-@app.route('/mine_block', methods=['GET'])
-def mine_block():
-    previous_block = blockchain.print_previous_block()
-    previous_proof = previous_block['proof']
-    proof = blockchain.proof_of_work(previous_proof)
-    previous_hash = blockchain.hash(previous_block)
-    block = blockchain.create_block(proof, previous_hash)
-     
-    response = {'message': 'A block is MINED',
-                'index': block['index'],
-                'timestamp': block['timestamp'],
-                'proof': block['proof'],
-                'previous_hash': block['previous_hash'],
-                'longitude': block['longitude'],
-                'latitude': block['latitude'],}
-     
-    return jsonify(response), 200
- 
-# Display blockchain in json format
-@app.route('/get_chain', methods=['GET'])
-def display_chain():
-    response = {'chain': blockchain.chain,
-                'length': len(blockchain.chain)}
-    return jsonify(response), 200
- 
-# Check validity of blockchain
-@app.route('/valid', methods=['GET'])
-def valid():
-    valid = blockchain.chain_valid(blockchain.chain)
-     
-    if valid:
-        response = {'message': 'The Blockchain is valid.'}
-    else:
-        response = {'message': 'The Blockchain is not valid.'}
-    return jsonify(response), 200
- 
- 
-# Run the flask server locally
-app.run(host=os.getenv('IP', '0.0.0.0'), 
-            port=int(os.getenv('PORT', 8080)))
-# app.run(host='0.0.0.0', port=4444)
+        pass
