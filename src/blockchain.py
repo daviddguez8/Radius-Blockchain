@@ -1,19 +1,21 @@
-import socket
-# Python program to create Blockchain
- 
 # For timestamp
 import datetime
- 
 # Calculating the hash
 # in order to add digital
 # fingerprints to the blocks
 import hashlib
- 
 # To store data
 # in our blockchain
 import json as JSON
- 
- 
+import socket
+import sys
+import time
+
+
+from .interfaces.block import Block
+from .interfaces.block_request import BlockRequest
+
+# Python program to create Blockchain
 class Blockchain:
    
     # This function is created
@@ -21,7 +23,7 @@ class Blockchain:
     # block and set its hash to "0"
     def __init__(self):
         self.chain = []
-        self.create_block(proof=1, previous_hash='0')
+        self.create_block(BlockRequest(0,'0', {}, {}, {}))
         self.lake_list = [
             ('0.0.0.0', 8080),
         ]
@@ -29,41 +31,28 @@ class Blockchain:
  
     # This function is created
     # to add further blocks
-    # into the chain
-    def create_block(self, proof, previous_hash):
-        #validate block
+    # into the chain it:
+    #   Validates block correctness
+    #   Adds block to current blockchain
+    #   Broadcasts the new block to other lakenodes
+    def create_block(self, data: BlockRequest):
+
+        block = {
+                'id': data.id,
+                'timestamp': time.time(),
+                'signature': data.signature,
+                'public_data': data.public_data,
+                'protected_data': data.protected_data,
+                'private_data': data.private_data
+        }
+        
         #add to current blockchain
-        #broadcast_to_network()
-        block = {'index': len(self.chain) + 1,
-                 'timestamp': str(datetime.datetime.now()),
-                 'proof': proof,
-                 'previous_hash': previous_hash,
-                 'longitude': 0.0,
-                 'latitude': 0.0}
         self.chain.append(block)
-        return block
+
+        #broadcast_to_network()
+        #self.broadcast_to_network(block)
+        return block['id']
        
-    # This function is created
-    # to display the previous block
-    def print_previous_block(self):
-        return self.chain[-1]
-       
-    # This is the function for proof of work
-    # and used to successfully mine the block
-    def proof_of_work(self, previous_proof):
-        new_proof = 1
-        check_proof = False
-         
-        while check_proof is False:
-            hash_operation = hashlib.sha256(
-                str(new_proof**2 - previous_proof**2).encode()).hexdigest()
-            if hash_operation[:5] == '00000':
-                check_proof = True
-            else:
-                new_proof += 1
-                 
-        return new_proof
- 
     def hash(self, block):
         encoded_block = JSON.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(encoded_block).hexdigest()
@@ -89,13 +78,12 @@ class Blockchain:
          
         return True
     
-    def broadcast_to_network(self):
+    def broadcast_to_network(self, block: Block):
         HOST = '172.20.44.19'
         PORT = 8080  # The port used by the server
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
-            
             message = str(self.chain)
             s.sendall(bytes(message, 'utf-8'))
             data = s.recv(1024)
@@ -104,5 +92,9 @@ class Blockchain:
         return
     
     def collect_from_network():
+        #From every lake collect its chain
 
+        #Resolve conflicts accross different chains (merging?)
+
+        #Update self chain by resolving conflicts
         pass

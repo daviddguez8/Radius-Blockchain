@@ -3,46 +3,48 @@
 import json as JSON
 import os
 import socket
+import uuid
 
 import requests
 # Flask is for creating the web
 # app and jsonify is for
 # displaying the blockchain
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from src.blockchain import Blockchain
+from src.interfaces.block_request import BlockRequest
 
- 
 # Creating the Web
 # App using flask
 app = Flask(__name__)
  
 # Create the object
 # of the class blockchain
+chains = {
+    'profile': Blockchain(),
+    'message': Blockchain()
+}
 profile_chain = Blockchain()
 messages_chain = Blockchain()
- 
+#TODO: When connecting to frontend, finish adding all parameters 
 # Adding a profile block
-@app.route('/add_profile_block', methods=['GET'])
-def add_profile_block():
+@app.route('/add_block/<chain_name>/<signature>', methods=['GET','POST'])
+def add_profile_block(chain_name, signature):
     #TODO: Implement
+    signature = request.args.get('signature')
+    public = {}
+    protected = {}
+    private = {}
+    
+    response = chains[chain_name].create_block(BlockRequest(uuid.uuid1(),signature, public, protected, private))
 
-    response = ''
     return jsonify(response), 200
-
-# Adding a message block
-@app.route('/add_message_block', methods=['GET'])
-def add_message_block():
-    #TODO: Implement
-
-    response = ''
-    return jsonify(response), 200
-
  
 # Sends blockchain in json format
-@app.route('/get_profiles_chain', methods=['GET'])
-def get_profiles_chain():
-    response = {'chain': profile_chain.chain,
+@app.route('/get_chain/<chain_name>', methods=['GET'])
+def get_profiles_chain(chain_name):
+    
+    response = {'chain': chains[chain_name].chain,
                 'length': len(profile_chain.chain)}
     return jsonify(response), 200
 
@@ -78,5 +80,8 @@ def broadcast_chain():
 '''
 
 # Run the flask server locally
-app.run(host=os.getenv('IP', '0.0.0.0'), 
-            port=int(os.getenv('PORT', 8080)))
+app.run(
+    host=os.getenv('IP', '0.0.0.0'),
+    port=int(os.getenv('PORT', 8080)),
+    debug=True
+)
