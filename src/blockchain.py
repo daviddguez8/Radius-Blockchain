@@ -36,7 +36,6 @@ class Blockchain:
     #   Adds block to current blockchain
     #   Broadcasts the new block to other lakenodes
     def create_block(self, data: BlockRequest):
-
         block = {
                 'id': data.id,
                 'timestamp': time.time(),
@@ -49,7 +48,7 @@ class Blockchain:
         #add to current blockchain
         self.chain.append(block)
 
-        #broadcast_to_network()
+        #broadcast_to_network
         #self.broadcast_to_network(block)
         return block['id']
        
