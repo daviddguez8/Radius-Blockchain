@@ -26,11 +26,13 @@ chains = {
 }
 profile_chain = Blockchain()
 messages_chain = Blockchain()
+
+
 #TODO: When connecting to frontend, finish adding all parameters 
 # Adding a block to a chain
 @app.route('/add_block/<chain_name>/<signature>', methods=['GET','POST'])
 def add_profile_block(chain_name, signature):
-    signature = request.args.get('signature')
+    signature = signature
     public = {}
     protected = {}
     private = {}
@@ -42,7 +44,6 @@ def add_profile_block(chain_name, signature):
 # Sends blockchain in json format
 @app.route('/get_chain/<chain_name>', methods=['GET'])
 def get_profiles_chain(chain_name):
-    
     response = {'chain': chains[chain_name].chain,
                 'length': len(chains[chain_name].chain)}
     return jsonify(response), 200
