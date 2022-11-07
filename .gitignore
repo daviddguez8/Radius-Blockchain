@@ -1,0 +1,3 @@
+# This files declares what files and directories are excluded from pushing. 
+/.venv/
+/__pycache__/
