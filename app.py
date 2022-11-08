@@ -61,17 +61,17 @@ def valid():
     return jsonify(response), 200
  
  
-'''
- Delete this method. 
- Broadcast should be a private responsibility of each chain, 
- part of the adding a block contract
+
+#  Delete this method. 
+#  Broadcast should be a private responsibility of each chain, 
+#  part of the adding a block contract
 
 @app.route('/broadcast_chain', methods=['GET'])
 def broadcast_chain():
     response = profile_chain.broadcast_to_network()
     
     return jsonify(response),200
-'''
+
 
 # Run the flask server locally
 app.run(

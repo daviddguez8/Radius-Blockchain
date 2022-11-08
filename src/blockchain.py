@@ -77,16 +77,16 @@ class Blockchain:
          
         return True
     
-    def broadcast_to_network(self, block: Block):
-        HOST = '172.20.44.19'
-        PORT = 8080  # The port used by the server
+    def broadcast_to_network(self):
+        HOST = '127.0.0.1'
+        PORT = 65432  # The port used by the server
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
             message = str(self.chain)
             s.sendall(bytes(message, 'utf-8'))
             data = s.recv(1024)
-            print("recieved", data)
+            print("received", data)
 
         return
     
