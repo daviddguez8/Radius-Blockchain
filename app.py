@@ -9,45 +9,81 @@ import requests
 # Flask is for creating the web
 # app and jsonify is for
 # displaying the blockchain
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
+from flask_cors import CORS, cross_origin
 
 from src.blockchain import Blockchain
 from src.interfaces.block_request import BlockRequest
 
-# Creating the Web
-# App using flask
-app = Flask(__name__)
- 
+
 # Create the object
 # of the class blockchain
 chains = {
-    'profile': Blockchain(),
-    'message': Blockchain()
+    'profiles': Blockchain(),
+    'messages': Blockchain()
 }
 profile_chain = Blockchain()
 messages_chain = Blockchain()
 
 
+# Creating the Web
+# App using flask
+app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+
+def _build_cors_preflight_response():
+    response = make_response()
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', '*')
+    response.headers.add('Access-Control-Allow-Methods', '*')
+    return response
+
+def _corsify_actual_response(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
 #TODO: When connecting to frontend, finish adding all parameters 
 # Adding a block to a chain
-@app.route('/add_block/<chain_name>/<signature>', methods=['GET','POST'])
-def add_profile_block(chain_name, signature):
-    signature = signature
-    public = {}
-    protected = {}
-    private = {}
+@app.route('/add_block/<chain_name>', methods=['GET','POST'])
+def add_profile_block(chain_name):
+    if(request.method == 'OPTIONS'):
+        return _build_cors_preflight_response()
     
-    response = chains[chain_name].create_block(BlockRequest(uuid.uuid1(),signature, public, protected, private))
+    try:
+        body = request.get_json()
 
-    return jsonify(response), 200
+        id = body['id']
+        signature = body['signature']
+        public = body['public']
+        protected = body['protected']
+        private = body['private']
+        
+        response = chains[chain_name].create_block(BlockRequest(id,signature, public, protected, private))
+        return jsonify(response), 200
+    except:
+        print('Request missing parameter', body)
+        return jsonify({}), 400
+
+    
  
 # Sends blockchain in json format
 @app.route('/get_chain/<chain_name>', methods=['GET'])
 def get_profiles_chain(chain_name):
+
     response = {'chain': chains[chain_name].chain,
                 'length': len(chains[chain_name].chain)}
     return jsonify(response), 200
 
+@app.route('/get_block/<chain_name>/<target_id>', methods = ['GET'])
+def get_block(chain_name, target_id):
+    if request.method == 'OPTIONS':
+        return _build_cors_preflight_response()
+    
+    found_block = chains[chain_name].get_block(target_id)
+    response = _corsify_actual_response(make_response(found_block))
+    return response
  
 # Check validity of blockchain
 @app.route('/valid', methods=['GET'])
