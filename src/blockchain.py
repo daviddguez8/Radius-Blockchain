@@ -25,7 +25,7 @@ class Blockchain:
         self.chain = []
         self.create_block(BlockRequest(0,'0', {}, {}, {}))
         self.lake_list = [
-            ('0.0.0.0', 8080),
+            ('127.0.0.1', 65432),
         ]
         self.ip='1.2.3.4'
  
@@ -64,15 +64,14 @@ class Blockchain:
 
    
     def broadcast_to_network(self):
-        HOST = '127.0.0.1'
-        PORT = 65432  # The port used by the server
-
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            message = str(self.chain)
-            s.sendall(bytes(message, 'utf-8'))
-            data = s.recv(1024)
-            print("received", data)
+        for bundle in self.lake_list:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((bundle[0], bundle[1]))
+                message = str(self.chain)
+                s.sendall(bytes(message, 'utf-8'))
+                data = s.recv(1024)
+                print("received", data)
+            
 
         return
     

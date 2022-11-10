@@ -102,9 +102,9 @@ def valid():
 #  Broadcast should be a private responsibility of each chain, 
 #  part of the adding a block contract
 
-@app.route('/broadcast_chain', methods=['GET'])
-def broadcast_chain():
-    response = profile_chain.broadcast_to_network()
+@app.route('/broadcast_chain/<chain_name>', methods=['GET'])
+def broadcast_chain(chain_name):
+    response = chains[chain_name].broadcast_to_network()
     
     return jsonify(response),200
 
