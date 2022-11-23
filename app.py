@@ -88,18 +88,6 @@ def get_block(chain_name, target_id):
     print(found_block)
     return response
  
-# Check validity of blockchain
-@app.route('/valid', methods=['GET'])
-def valid():
-    valid = profiles_chain.chain_valid(app.chain)
-     
-    if valid:
-        response = {'message': 'The Blockchain is valid.'}
-    else:
-        response = {'message': 'The Blockchain is not valid.'}
-    return jsonify(response), 200
- 
- 
 
 #  Delete this method. 
 #  Broadcast should be a private responsibility of each chain, 
