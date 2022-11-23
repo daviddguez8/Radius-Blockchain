@@ -47,22 +47,41 @@ def _corsify_actual_response(response):
 # Adding a block to a chain
 @app.route('/add_block/<chain_name>', methods=['GET','POST'])
 def add_profile_block(chain_name):
+    body = 0
     if(request.method == 'OPTIONS'):
         return _build_cors_preflight_response()
-    
-    try:
-        body = request.get_json()
 
-        id = body['id']
-        signature = body['signature']
-        public = body['public']
-        protected = body['protected']
-        private = body['private']
-        
-        response = chains[chain_name].create_block(BlockRequest(id,signature, public, protected, private))
-        return jsonify(response), 200
-    except:
-        print('Request missing parameter', body)
+    if(chain_name == "messages"):
+        try:
+            body = request.get_json()
+            id = body['id']
+            sender = body['sender']
+            recipient = body['recipient']
+            timestamp = body['timestamp']
+            private = body['private']
+            
+            response = chains[chain_name].create_block(BlockRequest(id,sender, recipient, timestamp, private))
+            return jsonify(response), 200
+        except:
+            print('Request missing parameter', body)
+            return jsonify({}), 400
+    elif(chain_name == "profiles"):
+        try:
+            body = request.get_json()
+
+            id = body['id']
+            signature = body['signature']
+            public = body['public']
+            protected = body['protected']
+            private = body['private']
+            
+            response = chains[chain_name].create_block(BlockRequest(id,signature, public, protected, private))
+            return jsonify(response), 200
+        except:
+            print('Request missing parameter', body)
+            return jsonify({}), 400
+    else:
+        print("Error in chain name decleration")
         return jsonify({}), 400
 
     
