@@ -1,5 +1,5 @@
 import json
-class Block:
+class ProfileBlock:
 
     def __init__(self, id, timestamp, signature, public_data,protected_data, private_data):
         self.id = id

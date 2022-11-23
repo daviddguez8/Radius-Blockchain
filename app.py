@@ -20,10 +20,9 @@ from src.interfaces.block_request import BlockRequest
 # of the class blockchain
 chains = {
     'profiles': Blockchain(),
-    'messages': Blockchain()
+    'messages': Blockchain(),
+    'interactions': Blockchain()
 }
-profile_chain = Blockchain()
-messages_chain = Blockchain()
 
 
 # Creating the Web
@@ -78,17 +77,21 @@ def get_profiles_chain(chain_name):
 
 @app.route('/get_block/<chain_name>/<target_id>', methods = ['GET'])
 def get_block(chain_name, target_id):
+    print('get block hit')
     if request.method == 'OPTIONS':
+        print('options???')
         return _build_cors_preflight_response()
     
     found_block = chains[chain_name].get_block(target_id)
     response = _corsify_actual_response(make_response(found_block))
+    print('get_block returning')
+    print(found_block)
     return response
  
 # Check validity of blockchain
 @app.route('/valid', methods=['GET'])
 def valid():
-    valid = profile_chain.chain_valid(app.chain)
+    valid = profiles_chain.chain_valid(app.chain)
      
     if valid:
         response = {'message': 'The Blockchain is valid.'}

@@ -12,7 +12,6 @@ import sys
 import time
 
 
-from .interfaces.block import Block
 from .interfaces.block_request import BlockRequest
 
 # Python program to create Blockchain
@@ -70,9 +69,6 @@ class Blockchain:
                 message = str(self.chain)
                 s.sendall(bytes(message, 'utf-8'))
                 data = s.recv(1024)
-                print("received", data)
-            
-
         return
     
     def collect_from_network():
