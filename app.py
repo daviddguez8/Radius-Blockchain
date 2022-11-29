@@ -2,10 +2,7 @@
 # in our blockchain
 import json as JSON
 import os
-import socket
-import uuid
 
-import requests
 # Flask is for creating the web
 # app and jsonify is for
 # displaying the blockchain
